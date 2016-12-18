@@ -1,5 +1,3 @@
-/* crenshaw's cradle */
-
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -106,7 +104,7 @@ void expression()
 {
     char c, outputstr[64];
 
-    snprintf(outputstr, 64, "MOVE #%c,D0", (char)getnumber(c));
+    snprintf(outputstr, 64, "MOVE #%c,D0", getnumber(c));
     emitln(outputstr);
 }
 
