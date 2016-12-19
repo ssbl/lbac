@@ -7,6 +7,7 @@
 #define TAB "    "
 
 int lookahead;
+void expression(void);
 
 void getch()
 {
@@ -58,6 +59,11 @@ int is_digit(int c)
     return isdigit(c);
 }
 
+int is_addop(int c)
+{
+    return (c == '+' || c == '-');
+}
+
 int getname()
 {
     int c;
@@ -100,12 +106,91 @@ void init()
     getch();
 }
 
-void expression()
+void factor()
 {
     char c, outputstr[64];
 
-    snprintf(outputstr, 64, "MOVE #%c,D0", getnumber(c));
-    emitln(outputstr);
+    if (lookahead == '(') {
+        match('(');
+        expression();
+        match(')');
+    } else {
+        snprintf(outputstr, 64, "MOVE #%c,D0", getnumber(c));
+        emitln(outputstr);
+    }
+}
+
+void multiply()
+{
+    match('*');
+    factor();
+    emitln("MULS (SP)+,D0");
+}
+
+void divide()
+{
+    match('/');
+    factor();
+    emitln("MOVE (SP)+,D1");
+    emitln("DIVS D1,D0");
+}
+
+void term()
+{
+    factor();
+
+    while (lookahead == '*' || lookahead == '/') {
+        emitln("MOVE D0,-(SP)");
+        switch(lookahead) {
+        case '*':
+            multiply();
+            break;
+        case '/':
+            divide();
+            break;
+        default:
+            expected("mulop");
+        }
+    }
+}
+
+void add()
+{
+    match('+');
+    term();
+    emitln("ADD (SP)+,D0");
+}
+
+void subtract()
+{
+    match('-');
+    term();
+    emitln("SUB (SP)+,D0");
+    emitln("NEG D0");
+}
+
+void expression()
+{
+    if (is_addop(lookahead)) {
+        emitln("CLR D0");
+    } else {
+        term();
+    }
+
+    while (is_addop(lookahead)) {
+        emitln("MOVE D0,-(SP)");
+
+        switch(lookahead) {
+        case '+':
+            add();
+            break;
+        case '-':
+            subtract();
+            break;
+        default:
+            expected("addop");
+        }
+    }
 }
 
 int
