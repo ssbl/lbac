@@ -4,24 +4,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAB "    "
-
 int lookahead;
 void expression(void);
 
-void getch()
+void
+getch(void)
 {
     lookahead = getchar();
 }
 
-void error(char *errstr)
+void
+error(char *errstr)
 {
     assert(errstr);
 
-    fprintf(stderr, "error: %s", errstr);
+    fprintf(stderr, "error: %s\n", errstr);
 }
 
-void halt(char *errstr)
+void
+halt(char *errstr)
 {
     assert(errstr);
 
@@ -29,15 +30,19 @@ void halt(char *errstr)
     exit(EXIT_FAILURE);
 }
 
-void expected(char *exp)
+void
+expected(char *exp)
 {
+    assert(exp);
+
     char expected_str[32];
 
-    snprintf(expected_str, 32, "%s expected\n", exp);
+    snprintf(expected_str, 32, "%s expected", exp);
     halt(expected_str);
 }
 
-void match(int c)
+void
+match(int c)
 {
     char expected_str[4];
 
@@ -49,26 +54,18 @@ void match(int c)
     }
 }
 
-int is_alpha(int c)
-{
-    return isalpha(c);
-}
-
-int is_digit(int c)
-{
-    return isdigit(c);
-}
-
-int is_addop(int c)
+int
+isaddop(int c)
 {
     return (c == '+' || c == '-');
 }
 
-int getname()
+int
+getname(void)
 {
     int c;
 
-    if (!is_alpha(lookahead)) {
+    if (!isalpha(lookahead)) {
         expected("name");
     } else {
         c = lookahead;
@@ -77,11 +74,12 @@ int getname()
     }
 }
 
-int getnumber()
+int
+getnumber(void)
 {
     int c;
 
-    if (!is_digit(lookahead)) {
+    if (!isdigit(lookahead)) {
         expected("number");
     } else {
         c = lookahead;
@@ -90,23 +88,27 @@ int getnumber()
     }
 }
 
-void emit(char *s)
+void
+emit(char *s)
 {
-    printf("%s%s", TAB, s);
+    printf("\t%s", s);
 }
 
-void emitln(char *s)
+void
+emitln(char *s)
 {
     emit(s);
     printf("\n");
 }
 
-void init()
+void
+init(void)
 {
     getch();
 }
 
-void factor()
+void
+factor(void)
 {
     char c, outputstr[64];
 
@@ -115,19 +117,21 @@ void factor()
         expression();
         match(')');
     } else {
-        snprintf(outputstr, 64, "MOVE #%c,D0", getnumber(c));
+        snprintf(outputstr, 64, "MOVE #%c,D0", getnumber());
         emitln(outputstr);
     }
 }
 
-void multiply()
+void
+multiply(void)
 {
     match('*');
     factor();
     emitln("MULS (SP)+,D0");
 }
 
-void divide()
+void
+divide(void)
 {
     match('/');
     factor();
@@ -135,13 +139,14 @@ void divide()
     emitln("DIVS D1,D0");
 }
 
-void term()
+void
+term(void)
 {
     factor();
 
     while (lookahead == '*' || lookahead == '/') {
         emitln("MOVE D0,-(SP)");
-        switch(lookahead) {
+        switch (lookahead) {
         case '*':
             multiply();
             break;
@@ -154,14 +159,16 @@ void term()
     }
 }
 
-void add()
+void
+add(void)
 {
     match('+');
     term();
     emitln("ADD (SP)+,D0");
 }
 
-void subtract()
+void
+subtract(void)
 {
     match('-');
     term();
@@ -169,18 +176,19 @@ void subtract()
     emitln("NEG D0");
 }
 
-void expression()
+void
+expression(void)
 {
-    if (is_addop(lookahead)) {
+    if (isaddop(lookahead)) {
         emitln("CLR D0");
     } else {
         term();
     }
 
-    while (is_addop(lookahead)) {
+    while (isaddop(lookahead)) {
         emitln("MOVE D0,-(SP)");
 
-        switch(lookahead) {
+        switch (lookahead) {
         case '+':
             add();
             break;
