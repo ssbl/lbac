@@ -107,6 +107,24 @@ init(void)
 }
 
 void
+ident(void)
+{
+    char name = getname();
+    char outputstr[64];
+
+    if (lookahead == '(') {
+        match('(');
+        match(')');
+
+        snprintf(outputstr, 64, "BSR %c", name);
+        emitln(outputstr);
+    } else {
+        snprintf(outputstr, 64, "MOVE %c(PC),D0", name);
+        emitln(outputstr);
+    }
+}
+
+void
 factor(void)
 {
     char c, outputstr[64];
@@ -115,6 +133,8 @@ factor(void)
         match('(');
         expression();
         match(')');
+    } else if (isalpha(lookahead)) {
+        ident();
     } else {
         snprintf(outputstr, 64, "MOVE #%c,D0", getnumber());
         emitln(outputstr);
@@ -200,11 +220,28 @@ expression(void)
     }
 }
 
+void
+assignment(void)
+{
+    char outputstr[64];
+    char name = getname();
+
+    match('=');
+    expression();
+
+    snprintf(outputstr, 64, "LEA %c(PC),A0", name);
+    emitln(outputstr);
+    emitln("MOVE D0,(A0)");
+}
+
 int
 main(void)
 {
     init();
-    expression();
+    assignment();
+    if (lookahead != '\n') {
+        expected("newline");
+    }
 
     return 0;
 }
