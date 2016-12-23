@@ -62,29 +62,31 @@ isaddop(int c)
 int
 getname(void)
 {
-    int c;
+    int c = 0;
 
     if (!isalpha(lookahead)) {
         expected("name");
     } else {
         c = lookahead;
         getch();
-        return c;
     }
+
+    return c;
 }
 
 int
 getnumber(void)
 {
-    int c;
+    int c = 0;
 
     if (!isdigit(lookahead)) {
         expected("number");
     } else {
         c = lookahead;
         getch();
-        return c;
     }
+
+    return c;
 }
 
 void
@@ -127,7 +129,7 @@ ident(void)
 void
 factor(void)
 {
-    char c, outputstr[64];
+    char outputstr[64];
 
     if (lookahead == '(') {
         match('(');
