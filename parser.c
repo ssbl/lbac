@@ -22,7 +22,7 @@ skip_white(void)
 }
 
 void
-error(char *errstr)
+error(const char *errstr)
 {
     assert(errstr);
 
@@ -39,7 +39,7 @@ halt(char *errstr)
 }
 
 void
-expected(char *exp)
+expected(const char *exp)
 {
     assert(exp);
 
@@ -114,13 +114,13 @@ getnumber(void)
 }
 
 void
-emit(char *s)
+emit(const char *s)
 {
     printf("\t%s", s);
 }
 
 void
-emitln(char *s)
+emitln(const char *s)
 {
     emit(s);
     printf("\n");
