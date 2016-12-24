@@ -16,7 +16,7 @@ getch(void)
 void
 skip_white(void)
 {
-    while (isspace(lookahead)) {
+    while (lookahead == ' ' || lookahead == '\t') {
         getch();
     }
 }
