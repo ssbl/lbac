@@ -240,7 +240,7 @@ int
 main(void)
 {
     init();
-    assignment();
+    expression();
     if (lookahead != '\n') {
         expected("newline");
     }
