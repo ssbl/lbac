@@ -154,7 +154,7 @@ ident(void)
 void
 factor(void)
 {
-    char c, outputstr[64];
+    char outputstr[64];
 
     if (lookahead == '(') {
         match('(');
