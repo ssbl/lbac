@@ -7,5 +7,8 @@ cradle: cradle.c
 parser: parser.c
 	$(CC) $(CFLAGS) $< -o $@
 
+interp: interpreter.c
+	$(CC) $(CFLAGS) $< -o $@
+
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
