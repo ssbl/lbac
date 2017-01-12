@@ -7,6 +7,7 @@ int lookahead;
 int labelcount;
 void expression(void);
 void do_if(void);
+void do_while(void);
 
 void
 getch(void)
@@ -271,6 +272,9 @@ block(void)
         case 'i':
             do_if();
             break;
+        case 'w':
+            do_while();
+            break;
         default:
             other();
             break;
@@ -310,6 +314,30 @@ do_if(void)
         block();
     }
     match('e');
+    post_label(label2);
+}
+
+void
+do_while(void)
+{
+    char *label1, *label2;
+    char beqstr[32], brastr[32];
+
+    match('w');
+    label1 = new_label();
+    label2 = new_label();
+    post_label(label1);
+    condition();
+
+    snprintf(beqstr, 32, "BEQ %s", label2);
+    emitln(beqstr);
+
+    block();
+    match('e');
+
+    snprintf(brastr, 32, "BRA %s", label1);
+    emitln(brastr);
+
     post_label(label2);
 }
 
