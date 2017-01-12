@@ -8,6 +8,7 @@ int labelcount;
 void expression(void);
 void do_if(void);
 void do_while(void);
+void do_loop(void);
 
 void
 getch(void)
@@ -275,6 +276,9 @@ block(void)
         case 'w':
             do_while();
             break;
+        case 'p':
+            do_loop();
+            break;
         default:
             other();
             break;
@@ -339,6 +343,22 @@ do_while(void)
     emitln(brastr);
 
     post_label(label2);
+}
+
+void
+do_loop(void)
+{
+    char *label;
+    char brastr[32];
+
+    match('p');
+    label = new_label();
+    post_label(label);
+    block();
+    match('e');
+
+    snprintf(brastr, 32, "BRA %s", label);
+    emitln(brastr);
 }
 
 void
